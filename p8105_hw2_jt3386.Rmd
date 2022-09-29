@@ -7,6 +7,7 @@ output: github_document
 
 ```{r setup, include = FALSE}
 library(tidyverse)
+library(readxl)
 ```
 
 # Problem 1
@@ -45,6 +46,128 @@ nrow(filter(A_df, ada == TRUE))
   
 ```
 
+# Problem 2
 
 
+import mr. trash wheel
+```{r}
+mr_trash_wheel_df = 
+  read_excel('data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx', 
+             range = "A2:N535") %>% 
+  janitor::clean_names() %>% 
+  drop_na(year) %>% 
+  mutate(
+    sports_balls = as.integer(sports_balls),
+    type = "Mr Trash Wheel",
+    dumpster = as.double(dumpster)
+  )
+```
+
+import professor trash whell
+```{r}
+pro_trash_wheel_df =
+  read_excel('data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx',
+             range = "Professor Trash Wheel!A2:N117") %>% 
+  janitor::clean_names() %>% 
+  drop_na(dumpster) %>% 
+  mutate(
+    sports_balls = as.integer(sports_balls),
+    type = "Professor Trash Wheel"
+  )
+```
+
+combine the two datasets
+```{r}
+combined_df = 
+  bind_rows(mr_trash_wheel_df, pro_trash_wheel_df)
+
+filter(combined_df, type == "Mr Trash Wheel") %>% 
+  pull(weight_tons) %>% 
+  sum()
+
+filter(combined_df, type == "Professor Trash Wheel") %>% 
+  pull(sports_balls) %>% 
+  sum()
+```
+
+
+# Problem 3
+
+
+clean the pols
+```{r}
+pols_df = read_csv('data/fivethirtyeight_datasets/pols-month.csv') %>% 
+  separate(mon, sep = '-', into = c("year","month","day")) %>% 
+  mutate(
+    month = recode(month,
+                   '01' = 'January',
+                   '02' = 'February',
+                   '03' = 'March',
+                   '04' = 'April',
+                   '05' = 'May',
+                   '06' = 'June',
+                   '07' = 'July',
+                   '08' = 'August',
+                   '09' = 'September',
+                   '10' = 'October',
+                   '11' = 'November',
+                   '12' = 'December'),
+    president = recode(prez_dem, `1` = "dem", `0` = "gop")
+  ) %>% 
+  select(-day, -prez_dem, -prez_gop)
+```
+
+clean the snp
+```{r}
+snp_df = 
+  read_csv('data/fivethirtyeight_datasets/snp.csv') %>% 
+  separate(date, sep = '/', into = c('month', 'day', 'year')) %>% 
+  mutate(
+    month = recode(month,
+                   '1' = 'January',
+                   '2' = 'February',
+                   '3' = 'March',
+                   '4' = 'April',
+                   '5' = 'May',
+                   '6' = 'June',
+                   '7' = 'July',
+                   '8' = 'August',
+                   '9' = 'September',
+                   '10' = 'October',
+                   '11' = 'November',
+                   '12' = 'December'),
+    year = as.integer(year) + 2000
+  ) %>% 
+  select(year, month, close)
+```
+
+clean the unemployment
+```{r}
+unemployment_df = 
+  read_csv('data/fivethirtyeight_datasets/unemployment.csv') %>% 
+  pivot_longer(
+    Jan:Dec,
+    names_to = 'month',
+    values_to = 'unemployment_percentage'
+  ) %>% 
+  mutate(
+    month = recode(month,
+                   'Jan' = 'January',
+                   'Feb' = 'February',
+                   'Mar' = 'March',
+                   'Apr' = 'April',
+                   'Jun' = 'June',
+                   'Jul' = 'July',
+                   'Aug' = 'August',
+                   'Sep' = 'September',
+                   'Oct' = 'October',
+                   'Nov' = 'November',
+                   'Dec' = 'December')
+  ) %>% 
+  janitor::clean_names()
+```
+```{r}
+result1 = merge(snp_df, pols_df)
+result2 = merge(unemployment_df, result1)
+```
 
