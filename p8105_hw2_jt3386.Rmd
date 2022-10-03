@@ -91,18 +91,6 @@ Now we combine the two datasets.
 ```{r}
 combined_df = 
   bind_rows(mr_trash_wheel_df, pro_trash_wheel_df)
-
-filter(combined_df, type == "Mr Trash Wheel") %>% 
-  pull(weight_tons) %>% 
-  sum()
-
-filter(combined_df, type == "Professor Trash Wheel") %>% 
-  pull(sports_balls) %>% 
-  sum()
-
-pull(combined_df, homes_powered) %>% 
-  sum %>% 
-  round
 ```
 
 The combined dataset has `r nrow(combined_df)` rows and `r ncol(combined_df)` columns. The variables include dumpster number, time(month, year, and date), weight, volume, different kinds of trash and their amount, homes powered by trash-made electricity, and the type of Trash Wheel.
