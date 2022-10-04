@@ -61,14 +61,13 @@ First we import Mr. Trash Wheel dataset, specify the sheet, omit non-data entrie
 
 ```{r}
 mr_trash_wheel_df = 
-  read_excel('data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx', 
-             range = "Mr. Trash Wheel!A2:N535") %>% 
+  read_excel('data/Trash Wheel Collection Data.xlsx', 
+             range = "Mr. Trash Wheel!A2:N550") %>% 
   janitor::clean_names() %>% 
-  drop_na(year) %>% 
+  drop_na(dumpster) %>% 
   mutate(
     sports_balls = as.integer(sports_balls),
-    type = "Mr Trash Wheel",
-    dumpster = as.double(dumpster)
+    type = "Mr Trash Wheel"
   )
 ```
 
@@ -76,12 +75,12 @@ Then use a similar process to import Professor Trash Wheel dataset.
 
 ```{r}
 pro_trash_wheel_df =
-  read_excel('data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx',
-             range = "Professor Trash Wheel!A2:N117") %>% 
+  read_excel('data/Trash Wheel Collection Data.xlsx',
+             range = "Professor Trash Wheel!A2:M97") %>% 
   janitor::clean_names() %>% 
   drop_na(dumpster) %>% 
   mutate(
-    sports_balls = as.integer(sports_balls),
+    year = as.character(year),
     type = "Professor Trash Wheel"
   )
 ```
@@ -95,11 +94,11 @@ combined_df =
 
 The combined dataset has `r nrow(combined_df)` rows and `r ncol(combined_df)` columns. The variables include dumpster number, time(month, year, and date), weight, volume, different kinds of trash and their amount, homes powered by trash-made electricity, and the type of Trash Wheel.
 
-In all, there are `r nrow(filter(combined_df, type == "Mr Trash Wheel"))` Mr Trash Wheel dumpster and `r nrow(filter(combined_df, type == "Professor Trash Wheel"))` Professor Trash Wheel dumpster documented.
+In all, there are `r nrow(filter(combined_df, type == "Mr Trash Wheel"))` Mr Trash Wheel dumpsters and `r nrow(filter(combined_df, type == "Professor Trash Wheel"))` Professor Trash Wheel dumpsters documented.
 The total weight of trash collected by Professor Trash Wheel is `r sum(pull(filter(combined_df, type == "Professor Trash Wheel"), weight_tons))` tons. 
 The total number of sports balls collected by Mr. Trash Wheel in 2020 is `r sum(pull(filter(combined_df, type == "Mr Trash Wheel" & year == "2020"), sports_balls))`.
 The total volume of trash collected by Professor Trash Wheel is `r sum(pull(filter(combined_df, type == "Professor Trash Wheel"), volume_cubic_yards))` yards, while by Mr. Trash Wheel, the total volume is `r sum(pull(filter(combined_df, type == "Mr Trash Wheel"), volume_cubic_yards))` yards.
-Totally, the two Trash Wheels have powered `r round(sum(pull(combined_df, homes_powered)))` homes in Maryland with electricity.
+Totally, the two Trash Wheels have powered `r round(sum(pull(combined_df, homes_powered), na.rm = TRUE))` homes in Maryland with electricity.
 
 
 # Problem 3
